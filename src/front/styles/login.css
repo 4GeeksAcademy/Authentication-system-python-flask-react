@@ -1,0 +1,48 @@
+.login-form-container {
+    min-height: 90vh;
+    padding-top: 5%;
+    background-color: rgb(41, 116, 255);
+    color: white;
+}
+
+.row-form {
+    padding: 3% 0;
+    display: flex;
+    align-items: flex-start;
+}
+
+.row-form>div[class*="col"] {
+    padding: 5% 0;
+}
+
+.row-form div[class*="col"] input {
+    background-color: rgb(255, 255, 255);
+    border-radius: 20px;
+    width: 60%;
+    border: none;
+    border-bottom: 1px solid black;
+    margin: 1.5%;
+    padding-left: 3%;
+}
+
+.row-form div[class*="col"] input:focus {
+    outline: none;
+}
+
+.row-form div[class*="col"] input::placeholder {
+    color: black;
+    /* padding-left: 5%; */
+}
+
+.row-form div[class*="col"] button {
+    background-color: rgb(255, 255, 255);
+    border-radius: 20px;
+    width: 20%;
+    border: none;
+    border-bottom: 1px solid black;
+    margin: 1.5%;
+}
+
+.row-form div[class*="col"] h1 {
+    line-height: normal;
+}
