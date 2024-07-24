@@ -10,41 +10,54 @@ import json
 
 api = Blueprint('api', __name__)
 
+
+#CREAR USUARIO
+
 @api.route('/user', methods=['POST'])
 def add_new_user():
-    body = json.loads(request.data)
-    user_password = body["password"]
+    try:
+        # Obtener datos del cuerpo de la solicitud
+        body = request.get_json()
 
-    # Mensajes campos sin completar
-    if not body.get("name"):
-        return jsonify({"msg": "Introduzca nombre"}), 401
-    if not body.get("email"):
-        return jsonify({"msg": "Introduzca un correo"}), 401
-    if not body.get("password"):
-        return jsonify({"msg": "Introduzca una contraseña"}), 401
+        # Validación de campos
+        if not body:
+            return jsonify({"msg": "El cuerpo de la solicitud está vacío"}), 400
 
-    # Comprobamos si el correo o el nombre ya están registrados
-    nombre_existente = User.query.filter_by(name=body["name"]).first()
-    correo_existente = User.query.filter_by(email=body["email"]).first()
+        if not body.get("name"):
+            return jsonify({"msg": "Introduzca nombre"}), 400
+        if not body.get("email"):
+            return jsonify({"msg": "Introduzca un correo"}), 400
+        if not body.get("password"):
+            return jsonify({"msg": "Introduzca una contraseña"}), 400
 
-    if nombre_existente or correo_existente:
-        return jsonify({"msg": "El nombre o correo ya está registrado"}), 400
+        # Comprobar si el correo o el nombre ya están registrados
+        nombre_existente = User.query.filter_by(name=body["name"]).first()
+        correo_existente = User.query.filter_by(email=body["email"]).first()
 
-    # Hash password
-    hashed_password = current_app.bcrypt.generate_password_hash(body["password"]).decode('utf-8')
+        if nombre_existente or correo_existente:
+            return jsonify({"msg": "El nombre o correo ya está registrado"}), 400
 
-    # Guardar nuevo usuario con hashed_password
-    user = User(name=body["name"], email=body["email"], password=hashed_password)
-    db.session.add(user)
-    db.session.commit()
+        # Hash de la contraseña
+        hashed_password = current_app.bcrypt.generate_password_hash(body["password"]).decode('utf-8')
 
-    # Respuesta
-    response_body = {
-        "msg": "Usuario creado"
-    }
+        # Crear nuevo usuario con la contraseña hasheada
+        user = User(name=body["name"], email=body["email"], password=hashed_password, is_active=True)
+        db.session.add(user)
+        db.session.commit()
 
-    return jsonify(response_body), 200
+        # Respuesta
+        response_body = {
+            "msg": "Usuario creado"
+        }
 
+        return jsonify(response_body), 201
+
+    except Exception as e:
+        # Capturar cualquier excepción y devolver un mensaje de error
+        return jsonify({"msg": f"Error en la solicitud: {str(e)}"}), 500
+
+
+#ELIMINAR USUARIO
 
 @api.route('/user', methods=['DELETE'])
 def delete_user():
@@ -63,6 +76,8 @@ def delete_user():
 
     return jsonify(response_body), 200
 
+
+#INICIO DE SESION DE USUARIO
 
 @api.route("/login", methods=["POST"])
 def login():
